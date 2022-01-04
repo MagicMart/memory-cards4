@@ -153,7 +153,7 @@ function App() {
             key={i + icon}
             index={i}
             dispatch={dispatch}
-            open={state.opened[i] !== undefined}
+            open={!!state.opened[i]}
             matched={state.matched.includes(icon)}
           />
         ))}
