@@ -1,5 +1,3 @@
-// @flow
-
 import React from "react"
 import { FaStar, FaRedo } from "react-icons/fa"
 import styled from "styled-components"
