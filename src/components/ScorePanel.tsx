@@ -34,7 +34,7 @@ function Stars({ moves }: { moves: number }) {
 type Props = {
   moves: number
   gameOver: boolean
-  dispatch: Function
+  dispatch: React.Dispatch<{ type: "reset" }>
 }
 
 function ScorePanel({ moves, gameOver, dispatch }: Props) {
