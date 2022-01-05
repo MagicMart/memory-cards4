@@ -71,7 +71,7 @@ type Props = {
   matched: boolean
   dispatch: React.Dispatch<{
     type: "open"
-    payload: { iconName: string; index: number }
+    payload: { index: number }
   }>
 }
 
@@ -80,7 +80,7 @@ function Card({ iconName, index, dispatch, open, matched }: Props) {
   const handleDispatch = () => {
     open === false &&
       matched === false &&
-      dispatch({ type: "open", payload: { iconName, index } })
+      dispatch({ type: "open", payload: { index } })
   }
   return (
     <StyledCard

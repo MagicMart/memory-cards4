@@ -7,13 +7,13 @@ import EndGame from "./EndGame"
 
 interface State {
   icons: string[]
-  opened: string[]
+  opened: number[]
   matched: string[]
   moves: number
 }
 
 type Action =
-  | { type: "open"; payload: { iconName: string; index: number } }
+  | { type: "open"; payload: { index: number } }
   | { type: "close" }
   | { type: "matched"; payload: string }
   | { type: "reset" }
@@ -73,15 +73,13 @@ function shuffleArr(arr: string[]) {
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "open":
-      const open = state.opened.filter(Boolean)
-      if (open.length === 2) {
+      if (state.opened.length === 2) {
         return state
       }
-      const copyOpened = [...state.opened]
-      copyOpened[action.payload.index] = action.payload.iconName
+
       return {
         ...state,
-        opened: copyOpened,
+        opened: [...state.opened, action.payload.index],
         moves: state.moves === -1 ? 0 : state.moves,
       }
 
@@ -127,16 +125,15 @@ function App() {
   }, [state.icons])
 
   React.useEffect(() => {
-    const open = state.opened.filter(Boolean)
-    if (open.length === 2) {
-      if (open[0] === open[1]) {
-        dispatch({ type: "matched", payload: open[0] })
+    if (state.opened.length === 2) {
+      if (state.icons[state.opened[0]] === state.icons[state.opened[1]]) {
+        dispatch({ type: "matched", payload: state.icons[state.opened[0]] })
       }
       setTimeout(() => {
         dispatch({ type: "close" })
       }, 500)
     }
-  }, [state.opened])
+  }, [state.opened, state.icons])
   return (
     <Container>
       {state.matched.length === 8 && <EndGame dispatch={dispatch} />}
@@ -153,7 +150,7 @@ function App() {
             key={i + icon}
             index={i}
             dispatch={dispatch}
-            open={!!state.opened[i]}
+            open={state.opened.includes(i)}
             matched={state.matched.includes(icon)}
           />
         ))}
