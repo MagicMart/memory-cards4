@@ -76,7 +76,11 @@ type Props = {
 }
 
 function Card({ iconName, index, dispatch, open, matched }: Props) {
-  const Icon = iconsStore[iconName]
+  const icon = React.createElement(
+    iconsStore[iconName],
+    { className: "icon", size: "50%" },
+    null
+  )
   const handleDispatch = () => {
     open === false &&
       matched === false &&
@@ -88,7 +92,7 @@ function Card({ iconName, index, dispatch, open, matched }: Props) {
       matched={matched}
       onClick={handleDispatch}
     >
-      <Icon className="icon" size={"50%"} />
+      {icon}
     </StyledCard>
   )
 }
