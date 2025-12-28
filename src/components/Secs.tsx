@@ -2,18 +2,20 @@ import React from "react"
 
 function Secs({ gameOver }: { gameOver: boolean }) {
   const [secs, setSecs] = React.useState(0)
-  const id = React.useRef<any>(null)
+  const intervalId = React.useRef<NodeJS.Timeout | null>(null)
 
   React.useEffect(() => {
-    id.current = window.setInterval(() => {
-      setSecs((secs) => secs + 1)
+    // Don't start a new interval if game is already over
+    if (gameOver) return
+
+    intervalId.current = setInterval(() => {
+      setSecs((prevSecs) => prevSecs + 1)
     }, 1000)
-    return () => window.clearInterval(id.current)
-  }, [])
 
-  React.useEffect(() => {
-    if (gameOver) {
-      window.clearInterval(id.current)
+    return () => {
+      if (intervalId.current) {
+        clearInterval(intervalId.current)
+      }
     }
   }, [gameOver])
 
