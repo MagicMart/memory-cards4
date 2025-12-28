@@ -19,6 +19,10 @@ type Action =
   | { type: "reset" }
   | { type: "icons"; payload: string[] }
 
+// Game constants
+const CARD_FLIP_DELAY_MS = 500
+const TOTAL_PAIRS = 8
+
 const iconsArr = [
   "FaBug",
   "FaBug",
@@ -66,8 +70,14 @@ const Container = styled.div`
   }
 `
 
-function shuffleArr(arr: string[]) {
-  return [...arr].sort(() => 0.5 - Math.random())
+// Fisher-Yates shuffle algorithm for proper randomization
+function shuffleArr(arr: string[]): string[] {
+  const shuffled = [...arr]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
 }
 
 const reducer = (state: State, action: Action): State => {
@@ -119,28 +129,39 @@ function App() {
     if (state.icons.length === 0) {
       dispatch({
         type: "icons",
-        payload: shuffleArr(shuffleArr(iconsArr)),
+        payload: shuffleArr(iconsArr),
       })
     }
   }, [state.icons])
 
+  // Handle card matching logic when two cards are opened
   React.useEffect(() => {
-    if (state.opened.length === 2) {
-      if (state.icons[state.opened[0]] === state.icons[state.opened[1]]) {
-        dispatch({ type: "matched", payload: state.icons[state.opened[0]] })
-      }
-      setTimeout(() => {
-        dispatch({ type: "close" })
-      }, 500)
+    if (state.opened.length !== 2) return
+
+    const [firstIndex, secondIndex] = state.opened
+    const firstCard = state.icons[firstIndex]
+    const secondCard = state.icons[secondIndex]
+    const isMatch = firstCard === secondCard
+
+    if (isMatch) {
+      dispatch({ type: "matched", payload: firstCard })
     }
+
+    const timeoutId = setTimeout(() => {
+      dispatch({ type: "close" })
+    }, CARD_FLIP_DELAY_MS)
+
+    return () => clearTimeout(timeoutId)
   }, [state.opened, state.icons])
+  const isGameOver = state.matched.length === TOTAL_PAIRS
+
   return (
     <Container>
-      {state.matched.length === 8 && <EndGame dispatch={dispatch} />}
+      {isGameOver && <EndGame dispatch={dispatch} />}
       <h1>Memory Game Cards</h1>
       <ScorePanel
         moves={state.moves}
-        gameOver={state.matched.length === 8}
+        gameOver={isGameOver}
         dispatch={dispatch}
       />
       <div className="cardContainer">
